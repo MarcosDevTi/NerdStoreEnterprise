@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +33,6 @@ namespace NSE.Identidade.Api.Controllers
         [HttpPost("nova-conta")]
         public async Task<IActionResult> Register(UsuarioRegistro usuarioRegistro)
         {
-            return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
             var user = new IdentityUser
