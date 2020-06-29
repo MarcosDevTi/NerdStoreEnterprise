@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Net.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.DataAnnotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSE.WebApp.MVC.Extensions;
@@ -7,8 +10,6 @@ using NSE.WebApp.MVC.Services.Handlers;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
-using System;
-using System.Net.Http;
 
 namespace NSE.WebApp.MVC.Configuration
 {
@@ -16,14 +17,16 @@ namespace NSE.WebApp.MVC.Configuration
     {
         public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<IValidationAttributeAdapterProvider, CpfValidationAttributeAdapterProvider>();
+
             services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
 
             services.AddHttpClient<IAutenticacaoService, AutenticacaoService>();
 
             services.AddHttpClient<ICatalogoService, CatalogoService>()
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
-                ////.AddTransientHttpErrorPolicy(
-                ////p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(600)));
+                //.AddTransientHttpErrorPolicy(
+                //p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(600)));
                 .AddPolicyHandler(PollyExtensions.EsperarTentar())
                 .AddTransientHttpErrorPolicy(
                     p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
@@ -49,7 +52,7 @@ namespace NSE.WebApp.MVC.Configuration
     {
         public static AsyncRetryPolicy<HttpResponseMessage> EsperarTentar()
         {
-            var retry = HttpPolicyExtensions
+            var retry =  HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .WaitAndRetryAsync(new[]
                 {

@@ -16,7 +16,7 @@ namespace NSE.WebApp.MVC.Configuration
                 });
         }
 
-        public static void UserIdentityConfiguration(this IApplicationBuilder app)
+        public static void UseIdentityConfiguration(this IApplicationBuilder app)
         {
             app.UseAuthentication();
             app.UseAuthorization();
